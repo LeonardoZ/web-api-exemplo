@@ -29,3 +29,40 @@ em outras camadas.
 O uso de inglês/português nesse projeto é um problema; a semantica das funções do java 8 também. Portanto, pretendo melhorar
 esses conceitos futuramente. 
 
+Um exemplo de utilização:
+  
+		// Ponto de partida.
+		FilmesState estado1 = FilmesState.inicar();
+
+		// Exemplo de interação do client
+		Supplier<FilmesState> todosFilmes = estado1.getTodosFilmes().get();
+		FilmesState estado2 = todosFilmes.get();
+		List<Filme> filmes = estado2.getFilmes();
+		
+		// Mantendo no mesmo estado, mas com outro recurso em foco.
+		FilmesState estado3 = estado2.getMelhoresPorNota().get().apply(10);
+		List<Filme> filmesComNota10 = estado3.getFilmes();
+		
+		Filme filme = new Filme("Kill Bill", "Tarantino", "Blood", 10);
+		Function<Filme, FilmeState> salvaFilme = estado3.getSalvaFilme().get();
+		
+		// Troca de estado FilmesState -> FilmeState ao salvar recurso na coleção
+		FilmeState estado4 = salvaFilme.apply(filme);
+
+		Filme filme2 = estado4.getFilme();
+		filme2.setNota(0);
+		FilmeState estado5 = estado4.getClassificaFilme().get().apply(filme2);
+		Filme filme3 = estado5.getFilme();
+	
+		FilmesState estado6 = estado5.getRemoveFilme().get().apply("KILL BILL");
+		
+		// Exemplo de retorno de States possíveis da API
+		FilmesState estado7 = estado6.getTodosFilmes().get().get();
+		List<FilmeState> filmesEmEstado = estado7.getFilmesEmEstado();
+
+		for (FilmeState filmeState : filmesEmEstado) {
+			Supplier<FilmeState> getSelf = filmeState.getSelf().get();
+			FilmeState filmeStateSelf = getSelf.get();
+		}
+
+
